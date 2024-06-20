@@ -13,11 +13,11 @@ os.makedirs('Bill_Database', exist_ok=True)
 
 # Sample data for items in the supermarket
 items = {
-    '001': {'name': 'Milk', 'price': 1.50},
-    '002': {'name': 'Bread', 'price': 2.00},
-    '003': {'name': 'Eggs', 'price': 0.20},
-    '004': {'name': 'Apple', 'price': 0.30},
-    '005': {'name': 'Banana', 'price': 0.25}
+    '001': {'name': 'Milk', 'price': 700.00},
+    '002': {'name': 'Bread', 'price': 600.00},
+    '003': {'name': 'Eggs', 'price': 200.00},
+    '004': {'name': 'Apple', 'price': 500.00},
+    '005': {'name': 'Banana', 'price': 100.00}
 }
 
 class SupermarketBillingApp:
