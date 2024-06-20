@@ -88,7 +88,7 @@ class SupermarketBillingApp:
 
     def print_bill(self):
         if not self.cart:
-            messagebox.showwarning("Error", "No items in the cart")
+            messagebox.showwarning("There is an Error", "No items in the cart")
             return
 
         now = datetime.now()
