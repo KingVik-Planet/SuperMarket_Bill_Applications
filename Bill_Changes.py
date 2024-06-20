@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, simpledialog
+from tkinter import ttk, messagebox
 from tkinter import simpledialog
 import pandas as pd
 from reportlab.lib.pagesizes import letter
@@ -50,8 +50,8 @@ class SupermarketBillingApp:
             self.logo_label = tk.Label(self.header_frame, text="Kingsley Chika CHUKWU \nSupermarket", font=("Arial", 24))
             self.logo_label.pack(side=tk.LEFT, padx=10)
 
-        self.header_label = tk.Label(self.root, text="Welcome to Kingsley & Nadia Supermarket \nWe are Here to "
-                                                     "Serve you better", font=("Arial Rounded MT Bold", 28), borderwidth =10, background= "gray")
+        self.header_label = tk.Label(self.root, text="Welcome to KingVik Planet Supermarket \nWe are here to "
+                                                     "serve you better", font=("Arial Rounded MT Bold", 28), borderwidth =10, background= "gray")
         self.header_label.pack(pady=10)
 
         self.date_time_label = tk.Label(self.header_frame, font=("Arial Rounded MT Bold", 15))
@@ -201,7 +201,7 @@ class SupermarketBillingApp:
         c.drawString(30, 750, f"Kingsley Supermarket")
         c.drawString(30, 735, f"Date: {now.strftime('%Y-%m-%d %H:%M:%S')}")
         c.drawString(400, 750, f"Agent: {self.agent_name}")
-        c.drawString(30, 720, "-----------------------------------------------")
+        c.drawString(30, 720, "-----------------Unverified------------------------------")
 
         c.drawString(30, 705, "Item ID")
         c.drawString(100, 705, "Item Name")
@@ -213,20 +213,20 @@ class SupermarketBillingApp:
             c.drawString(30, y, item['item_id'])
             c.drawString(100, y, item['name'])
             c.drawString(300, y, str(item['quantity']))
-            c.drawString(400, y, f"₦{item['amount']:.2f}")
+            c.drawString(400, y, f"${item['amount']:.2f}")
             y -= 15
 
         total = sum(item['amount'] for item in self.cart)
         discount = total * 0.03
         total_after_discount = total - discount
 
-        c.drawString(30, y, "-----------------------------------------------")
+        c.drawString(30, y, "-------------------Verified----------------------------")
         y -= 15
         c.drawString(300, y, "Discount:")
-        c.drawString(400, y, f"₦-{discount:.2f}")
+        c.drawString(400, y, f"$-{discount:.2f}")
         y -= 15
         c.drawString(300, y, "Total:")
-        c.drawString(400, y, f"₦{total_after_discount:.2f}")
+        c.drawString(400, y, f"${total_after_discount:.2f}")
 
         # Generate QR code
         qr_code_path = f'bills/{customer_id}.png'
@@ -255,29 +255,28 @@ class SupermarketBillingApp:
         messagebox.showinfo("Success", f"Bill generated and saved as {filename}")
 
         self.save_to_excel(now, customer_id, total_after_discount)
-        self.reset_bill()
+        # self.reset_bill()
 
     def save_to_excel(self, now, customer_id, total_after_discount):
-        date_str = now.strftime("%Y%m%d")
-        filename = f'Bill_Database/Bill_Database_{date_str}.xlsx'
-        if os.path.exists(filename):
-            df = pd.read_excel(filename)
+        # Check if the Excel file exists, create if it doesn't
+        excel_file = 'sales_data.xlsx'
+        if not os.path.exists(excel_file):
+            df = pd.DataFrame(columns=['Date', 'Customer ID', 'Total'])
         else:
-            df = pd.DataFrame(columns=['Customer ID', 'Date Time', 'Agent', 'Item ID', 'Item Name', 'Quantity', 'Amount', 'Total After Discount'])
+            df = pd.read_excel(excel_file)
 
-        for item in self.cart:
-            df = df.append({
-                'Customer ID': customer_id,
-                'Date Time': now.strftime('%Y-%m-%d %H:%M:%S'),
-                'Agent': self.agent_name,
-                'Item ID': item['item_id'],
-                'Item Name': item['name'],
-                'Quantity': item['quantity'],
-                'Amount': item['amount'],
-                'Total After Discount': total_after_discount
-            }, ignore_index=True)
+        # Append data to the DataFrame
+        new_data = pd.DataFrame({
+            'Date': [now.strftime('%Y-%m-%d %H:%M:%S')],
+            'Customer ID': [customer_id],
+            'Total': [total_after_discount]
+        })
 
-        df.to_excel(filename, index=False)
+        # Concatenate the new data with the existing DataFrame
+        df = pd.concat([df, new_data], ignore_index=True)
+
+        # Save to Excel
+        df.to_excel(excel_file, index=False)
 
 
 if __name__ == "__main__":
