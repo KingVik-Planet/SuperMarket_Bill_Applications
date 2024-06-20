@@ -7,12 +7,14 @@ from reportlab.pdfgen import canvas
 from PIL import Image, ImageTk
 import os
 from datetime import datetime
+import qrcode
+
 
 # Create directories if not exist
 os.makedirs('bills', exist_ok=True)
 os.makedirs('Bill_Database', exist_ok=True)
 
-# Sample data for items in the supermarket
+#Data for items in the supermarket
 items = {
     '001': {'name': 'Milk', 'price': 700.00},
     '002': {'name': 'Bread', 'price': 600.00},
@@ -48,13 +50,14 @@ class SupermarketBillingApp:
             self.logo_label = tk.Label(self.header_frame, text="Kingsley Chika CHUKWU \nSupermarket", font=("Arial", 24))
             self.logo_label.pack(side=tk.LEFT, padx=10)
 
-        self.header_label = tk.Label(self.root, text="Welcome to Kingsley & Nadia Supermarket \nWhere quality Services is our beacon", font=("Arial", 28))
+        self.header_label = tk.Label(self.root, text="Welcome to Kingsley & Nadia Supermarket \nWe are Here to "
+                                                     "Serve you better", font=("Arial Rounded MT Bold", 28), borderwidth =10, background= "gray")
         self.header_label.pack(pady=10)
 
-        self.date_time_label = tk.Label(self.header_frame, font=("Arial", 20))
+        self.date_time_label = tk.Label(self.header_frame, font=("Arial Rounded MT Bold", 15))
         self.date_time_label.pack(side=tk.RIGHT, padx=10)
 
-        self.add_bill_button = tk.Button(self.root, text="Add Bill", command=self.add_bill)
+        self.add_bill_button = tk.Button(self.root, text="Add Bill",borderwidth =2, background= "gray",font=("Arial Rounded MT Bold", 15), command=self.add_bill)
         self.add_bill_button.pack(pady=5)
 
     def update_time(self):
@@ -67,11 +70,11 @@ class SupermarketBillingApp:
     def add_bill(self):
         self.agent_name = simpledialog.askstring("Agent Name", "Enter agent name:")
         if not self.agent_name:
-            messagebox.showwarning("Input Error", "Agent name is required")
+            messagebox.showwarning("Input Error", "Agent name is required \nKindly Enter your Name or ID")
             return
 
         self.add_bill_button.config(state=tk.DISABLED)
-        self.add_item_button = tk.Button(self.root, text="Add Item", command=self.add_item)
+        self.add_item_button = tk.Button(self.root, text="Add Item" ,borderwidth =2, background= "gray",font=("Arial Rounded MT Bold", 10), command=self.add_item)
         self.add_item_button.pack(pady=10)
 
         self.bill_tree = ttk.Treeview(self.root, columns=('Item ID', 'Item Name', 'Quantity', 'Amount'), show='headings')
@@ -79,21 +82,21 @@ class SupermarketBillingApp:
         self.bill_tree.heading('Item Name', text='Item Name')
         self.bill_tree.heading('Quantity', text='Quantity')
         self.bill_tree.heading('Amount', text='Amount')
-        self.bill_tree.pack(pady=20)
+        self.bill_tree.pack(pady=2)
 
-        self.edit_button = tk.Button(self.root, text="Edit Item", command=self.edit_item)
+        self.edit_button = tk.Button(self.root, text="Edit Item", borderwidth =2, background= "cyan",font=("Arial Rounded MT Bold", 15), command=self.edit_item)
         self.edit_button.pack(side=tk.RIGHT, anchor='ne', pady=5)
 
-        self.delete_button = tk.Button(self.root, text="Delete Item", command=self.delete_item)
+        self.delete_button = tk.Button(self.root, text="Delete Item",borderwidth =2, background= "Red",font=("Arial Rounded MT Bold", 15), command=self.delete_item)
         self.delete_button.pack(side=tk.RIGHT, anchor='ne', pady=5)
-        self.complete_button = tk.Button(self.root, text="Complete", command=self.complete)
+        self.complete_button = tk.Button(self.root, text="Complete",borderwidth =2, background= "green",font=("Arial Rounded MT Bold", 15), command=self.complete)
         self.complete_button.pack(side=tk.LEFT, anchor='ne', pady=5)
-        self.print_bill_button = tk.Button(self.root, text="Print Bill", command=self.print_bill)
+        self.print_bill_button = tk.Button(self.root, text="Print Bill",borderwidth =2, background= "gray",font=("Arial Rounded MT Bold", 15), command=self.print_bill)
         self.print_bill_button.pack(side=tk.LEFT, anchor='ne', pady=5)
 
-        self.discount_label = tk.Label(self.root, text="Discount: 3%")
+        self.discount_label = tk.Label(self.root, text="Discount: 3%",borderwidth =2, background= "gray",font=("Arial Rounded MT Bold", 15))
         self.discount_label.pack(pady=5)
-        self.total_label = tk.Label(self.root, text="Total: $0.00")
+        self.total_label = tk.Label(self.root, text="Total: $0.00", borderwidth =2, background= "gray",font=("Arial Rounded MT Bold", 15))
         self.total_label.pack(pady=5)
 
 
@@ -182,6 +185,8 @@ class SupermarketBillingApp:
         self.bill_tree.destroy()
         self.print_bill_button.destroy()
 
+
+
     def print_bill(self):
         if not self.cart:
             messagebox.showwarning("There is an Error", "No items in the cart")
@@ -189,7 +194,7 @@ class SupermarketBillingApp:
 
         now = datetime.now()
         date_time_str = now.strftime("%Y%m%d_%H%M%S")
-        customer_id = f"KCC{len(os.listdir('bills')) + 1:03d}_{date_time_str}"
+        customer_id = f"Kingsley{len(os.listdir('bills')) + 1:03d}_{date_time_str}"
         filename = f'bills/{customer_id}.pdf'
 
         c = canvas.Canvas(filename, pagesize=letter)
@@ -208,7 +213,7 @@ class SupermarketBillingApp:
             c.drawString(30, y, item['item_id'])
             c.drawString(100, y, item['name'])
             c.drawString(300, y, str(item['quantity']))
-            c.drawString(400, y, f"${item['amount']:.2f}")
+            c.drawString(400, y, f"₦{item['amount']:.2f}")
             y -= 15
 
         total = sum(item['amount'] for item in self.cart)
@@ -218,11 +223,34 @@ class SupermarketBillingApp:
         c.drawString(30, y, "-----------------------------------------------")
         y -= 15
         c.drawString(300, y, "Discount:")
-        c.drawString(400, y, f"$-{discount:.2f}")
+        c.drawString(400, y, f"₦-{discount:.2f}")
         y -= 15
         c.drawString(300, y, "Total:")
-        c.drawString(400, y, f"${total_after_discount:.2f}")
+        c.drawString(400, y, f"₦{total_after_discount:.2f}")
+
+        # Generate QR code
+        qr_code_path = f'bills/{customer_id}.png'
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(customer_id)
+        qr.make(fit=True)
+        img = qr.make_image(fill='black', back_color='white')
+        img.save(qr_code_path)
+
+        # Draw QR code on the PDF
+        if os.path.exists(qr_code_path):
+            c.drawImage(qr_code_path, 30, y - 100, width=100, height=100)
+
+        # Save the PDF
         c.save()
+
+        # Delete the QR code image file
+        if os.path.exists(qr_code_path):
+            os.remove(qr_code_path)
 
         messagebox.showinfo("Success", f"Bill generated and saved as {filename}")
 
