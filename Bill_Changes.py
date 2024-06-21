@@ -258,7 +258,7 @@ class SupermarketBillingApp:
         # self.reset_bill()
 
     def save_to_excel(self, now, customer_id, total_after_discount):
-        # Check if the Excel file exists, create if it doesn't
+        # Check if the Excel file exists else create it
         excel_file = 'sales_data.xlsx'
         if not os.path.exists(excel_file):
             df = pd.DataFrame(columns=['Date', 'Customer ID', 'Total'])
